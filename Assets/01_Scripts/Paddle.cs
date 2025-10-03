@@ -1,18 +1,13 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Paddle : MonoBehaviour
 {
-    [Header("Configuración")]
-    [Tooltip("Velocidad de movimiento vertical del paddle")]
-    public float speed = 10f;
+    public float speed = 12f;
+    public bool isPlayer1 = true; // W/S (true) o â†‘/â†“ (false)
 
-    [Tooltip("Eje vertical mínimo y máximo para limitar el movimiento")]
-    public float yMin = -4f;
-    public float yMax = 4f;
-
-    [Header("Controles")]
-    public string inputAxis = "Vertical"; 
-    private Rigidbody2D rb;
+    Rigidbody2D rb;
+    float moveInput;
 
     void Start()
     {
@@ -21,13 +16,22 @@ public class Paddle : MonoBehaviour
 
     void Update()
     {
+        if (isPlayer1)
+        {
+            if (Input.GetKey(KeyCode.W)) moveInput = 1f;
+            else if (Input.GetKey(KeyCode.S)) moveInput = -1f;
+            else moveInput = 0f;
+        }
+        else
+        {
+            if (Input.GetKey(KeyCode.UpArrow)) moveInput = 1f;
+            else if (Input.GetKey(KeyCode.DownArrow)) moveInput = -1f;
+            else moveInput = 0f;
+        }
+    }
 
-        float move = Input.GetAxis(inputAxis);
-
- 
-        float newY = Mathf.Clamp(transform.position.y + move * speed * Time.deltaTime, yMin, yMax);
-
-
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+    void FixedUpdate()
+    {
+        rb.velocity = new Vector2(0f, moveInput * speed);
     }
 }
