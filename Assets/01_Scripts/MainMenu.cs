@@ -21,7 +21,7 @@ public class MainMenu : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene("GameScene"); // Nombre exacto de la escena del juego
+        SceneManager.LoadScene("ScenePrincipal"); // Nombre exacto de la escena del juego
     }
 
     public void QuitGame()

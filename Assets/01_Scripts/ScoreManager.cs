@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
@@ -32,7 +33,7 @@ public class ScoreManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -50,10 +51,7 @@ public class ScoreManager : MonoBehaviour
             gameOverPanel.SetActive(false);
 
         // Configurar el botón de reinicio
-        if (restartButton != null)
-        {
-            restartButton.onClick.AddListener(RestartGame);
-        }
+        
     }
 
     // Métodos públicos para cambiar nombres desde otros scripts
@@ -129,15 +127,43 @@ public class ScoreManager : MonoBehaviour
             gameOverText.text = winnerName + " GANO!!!";
             gameOverPanel.SetActive(true);
         }
-    }
+        int currentHighScore = PlayerPrefs.GetInt("HighScore", 0);
+        int winnerScore = Mathf.Max(player1Score, player2Score);
+
+        if (winnerScore > currentHighScore)
+        {
+            PlayerPrefs.SetInt("HighScore", winnerScore);
+            PlayerPrefs.Save();
+        }
+
+    }       
 
     // Método para reiniciar el juego (llamado por el botón)
     public void RestartGame()
     {
-        ResetScores();
         Debug.Log("Juego reiniciado!");
-    }
 
+        // Recargar la escena
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        // Reasignar referencias después de que la escena cargue
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Buscar objetos de UI en la nueva escena
+        gameOverPanel = GameObject.Find("GameOverPanel"); // Nombre exacto
+        gameOverText = GameObject.Find("GameOverText").GetComponent<TMP_Text>();
+        restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
+
+        if (restartButton != null)
+            restartButton.onClick.AddListener(RestartGame);
+
+        ResetScores();
+
+        // Desuscribirse para que no se ejecute más veces
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
     public void ResetScores()
     {
         player1Score = 0;

@@ -9,7 +9,6 @@ public class Ball : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        Debug.Log("Start() llamado - Lanzando pelota");
         LaunchBall();
     }
 
@@ -17,7 +16,6 @@ public class Ball : MonoBehaviour
     {
         direction = new Vector2(Random.Range(-1f, 1f), Random.Range(-0.5f, 0.5f)).normalized;
         rb.velocity = direction * initialSpeed;
-        Debug.Log("Pelota lanzada con velocidad: " + rb.velocity);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -33,5 +31,23 @@ public class Ball : MonoBehaviour
             direction = new Vector2(direction.x, -direction.y);
             rb.velocity = direction * initialSpeed;
         }
+        else if (collision.gameObject.CompareTag("LeftGoal"))
+        {
+            // Punto para Player 2
+            ScoreManager.Instance.AddScore(false);
+            ResetBall();
+        }
+        else if (collision.gameObject.CompareTag("RightGoal"))
+        {
+            // Punto para Player 1
+            ScoreManager.Instance.AddScore(true);
+            ResetBall();
+        }
+    }
+
+    void ResetBall()
+    {
+        transform.position = Vector2.zero;
+        LaunchBall();
     }
 }
